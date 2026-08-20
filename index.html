@@ -517,6 +517,85 @@
             font-size: 0.9rem;
             border-top: 1px solid #e2e8f0;
             margin-top: 40px;
+            background: white;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .qr-section {
+            flex-shrink: 0;
+        }
+
+        .qr-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .qr-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .qr-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #4a6bff;
+        }
+
+        .qr-title i {
+            font-size: 1.2rem;
+        }
+
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            padding: 5px;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        .qr-container:hover .qr-code {
+            border-color: #4a6bff;
+        }
+
+        .qr-link {
+            margin-top: 8px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .qr-link a {
+            color: #4a6bff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .qr-link a:hover {
+            color: #6a11cb;
+            text-decoration: underline;
         }
 
         /* Responsive design */
@@ -599,6 +678,22 @@
             .action-buttons .btn {
                 width: 100%;
             }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+
+            .footer-info, .qr-section {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .qr-code {
+                width: 100px;
+                height: 100px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -609,6 +704,16 @@
             .result-header h1 {
                 font-size: 2rem;
             }
+
+            .qr-code {
+                width: 90px;
+                height: 90px;
+            }
+
+            .qr-container {
+                padding: 12px;
+            }
+        }
 
             .question-text {
                 font-size: 1.2rem;
@@ -733,7 +838,27 @@
     </div>
 
     <footer>
-        <p>Квиз по безопасности в сети</p>
+        <div class="footer-content">
+            <div class="footer-info">
+                <p>Квиз по безопасности в сети • Для развертывания на GitHub Pages</p>
+            </div>
+            <div class="qr-section">
+                <div class="qr-container">
+                    <div class="qr-title">
+                        <i class="fas fa-qrcode"></i>
+                        <span>Посетите наш сайт</span>
+                    </div>
+                    <img src="https://chart.googleapis.com/chart?cht=qr&chs=150x150&chl=https://ivan-artemev24.github.io/new-site/&choe=UTF-8" 
+                         alt="QR код для сайта https://ivan-artemev24.github.io/new-site/" 
+                         class="qr-code">
+                    <p class="qr-link">
+                        <a href="https://ivan-artemev24.github.io/new-site/" target="_blank" rel="noopener noreferrer">
+                            https://ivan-artemev24.github.io/new-site/
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
     </footer>
 
     <script>
