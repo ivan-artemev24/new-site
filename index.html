@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квиз: Безопасность в сети</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        /* Screen styles */
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Start screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            margin-bottom: 40px;
+        }
+
+        .logo i {
+            font-size: 4rem;
+            color: #4a6bff;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .logo h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #4a6bff, #6a11cb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .description {
+            margin-bottom: 50px;
+            font-size: 1.1rem;
+            color: #666;
+        }
+
+        .description p {
+            margin-bottom: 15px;
+        }
+
+        /* Button styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:active::after {
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(40, 40);
+                opacity: 0;
+            }
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #4a6bff 0%, #6a11cb 100%);
+            color: white;
+            font-size: 1.2rem;
+            padding: 18px 40px;
+            box-shadow: 0 4px 20px rgba(74, 107, 255, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 107, 255, 0.4);
+        }
+
+        .start-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Quiz screen */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .progress-container {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a6bff, #6a11cb);
+            border-radius: 4px;
+            width: 12.5%; /* 1/8 для первого вопроса */
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ffd166, #ff9e6d);
+            padding: 12px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(255, 158, 109, 0.3);
+        }
+
+        .score-display i {
+            font-size: 1.2rem;
+        }
+
+        /* Question container */
+        .question-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            margin-bottom: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .question-number {
+            font-size: 0.9rem;
+            color: #4a6bff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        /* Options */
+        .options-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            padding: 20px;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e0;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, rgba(74, 107, 255, 0.1), rgba(106, 17, 203, 0.1));
+            border-color: #4a6bff;
+            color: #4a6bff;
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, rgba(72, 187, 120, 0.1), rgba(56, 161, 105, 0.1));
+            border-color: #48bb78;
+            color: #2f855a;
+            animation: pulse 0.5s ease-out;
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, rgba(245, 101, 101, 0.1), rgba(229, 62, 62, 0.1));
+            border-color: #f56565;
+            color: #c53030;
+            animation: shake 0.5s ease-out;
+        }
+
+        .option-index {
+            width: 36px;
+            height: 36px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-index {
+            background: #4a6bff;
+            color: white;
+        }
+
+        .option.correct .option-index {
+            background: #48bb78;
+            color: white;
+        }
+
+        .option.incorrect .option-index {
+            background: #f56565;
+            color: white;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .prev-btn, .next-btn {
+            background: white;
+            color: #4a6bff;
+            border: 2px solid #e2e8f0;
+        }
+
+        .prev-btn:hover:not(:disabled), .next-btn:hover:not(:disabled) {
+            background: #f8fafc;
+            border-color: #4a6bff;
+            transform: translateY(-2px);
+        }
+
+        .prev-btn:disabled, .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .next-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hint-text {
+            color: #666;
+            font-size: 0.9rem;
+            font-style: italic;
+        }
+
+        /* Result screen */
+        .result-screen {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .result-header {
+            margin-bottom: 40px;
+        }
+
+        .result-icon i {
+            font-size: 5rem;
+            color: #4a6bff;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .result-header h1 {
+            font-size: 2.5rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+
+        .score-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
+
+        .score-circle {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+
+        .progress-ring-fill {
+            stroke-dasharray: 452.39;
+            stroke-dashoffset: 452.39;
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .score-percent {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .score-details {
+            text-align: left;
+        }
+
+        .score-item {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .score-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .score-item .label {
+            color: #666;
+        }
+
+        .score-item .value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .result-message {
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            color: #2d3748;
+            margin-bottom: 15px;
+        }
+
+        .result-description {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 20px;
+            line-height: 1.6;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, #ffd166, #ff9e6d);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-top: 20px;
+            animation: bounce 1.5s infinite ease-in-out;
+        }
+
+        .badge i {
+            font-size: 1.2rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #4a6bff 0%, #6a11cb 100%);
+            color: white;
+        }
+
+        .share-btn {
+            background: white;
+            color: #4a6bff;
+            border: 2px solid #e2e8f0;
+        }
+
+        .restart-btn:hover, .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 40px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .logo h1 {
+                font-size: 2rem;
+            }
+
+            .description {
+                font-size: 1rem;
+            }
+
+            .start-btn {
+                padding: 16px 32px;
+                font-size: 1.1rem;
+            }
+
+            .quiz-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 20px;
+            }
+
+            .progress-container {
+                min-width: auto;
+            }
+
+            .question-container {
+                padding: 25px;
+            }
+
+            .question-text {
+                font-size: 1.3rem;
+            }
+
+            .option {
+                padding: 16px;
+                font-size: 1rem;
+            }
+
+            .navigation {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .next-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .hint-text {
+                text-align: center;
+            }
+
+            .score-card {
+                flex-direction: column;
+                gap: 30px;
+                padding: 30px 20px;
+            }
+
+            .score-details {
+                text-align: center;
+            }
+
+            .score-item {
+                justify-content: space-between;
+                gap: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo h1 {
+                font-size: 1.7rem;
+            }
+
+            .result-header h1 {
+                font-size: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .score-circle {
+                width: 150px;
+                height: 150px;
+            }
+
+            .score-percent {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Стартовый экран -->
+        <div class="screen start-screen active">
+            <div class="logo">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Квиз: Безопасность в сети</h1>
+            </div>
+            <div class="description">
+                <p>Пройдите тест на знание основ кибербезопасности и узнайте, насколько хорошо вы защищены от онлайн-угроз.</p>
+                <p>Вас ждут 8 вопросов по разным аспектам безопасности в интернете.</p>
+            </div>
+            <button class="btn start-btn">
+                <span>Начать квиз</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Экран квиза -->
+        <div class="screen quiz-screen">
+            <div class="quiz-header">
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">Вопрос <span class="current-question">1</span> из <span class="total-questions">8</span></div>
+                </div>
+                <div class="score-display">
+                    <i class="fas fa-star"></i>
+                    <span class="score-value">0</span> баллов
+                </div>
+            </div>
+
+            <div class="question-container">
+                <div class="question-number">Вопрос <span class="q-num">1</span></div>
+                <h2 class="question-text"></h2>
+                <div class="options-container">
+                    <!-- Варианты ответов будут добавлены через JS -->
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn prev-btn" disabled>
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Назад</span>
+                </button>
+                <div class="next-container">
+                    <span class="hint-text"></span>
+                    <button class="btn next-btn">
+                        <span>Следующий вопрос</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Финальный экран -->
+        <div class="screen result-screen">
+            <div class="result-header">
+                <div class="result-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <h1>Результаты квиза</h1>
+            </div>
+            
+            <div class="score-card">
+                <div class="score-circle">
+                    <svg class="progress-ring" width="180" height="180">
+                        <circle class="progress-ring-circle" stroke="#e0e0e0" stroke-width="12" fill="transparent" r="72" cx="90" cy="90"/>
+                        <circle class="progress-ring-fill" stroke="#4CAF50" stroke-width="12" fill="transparent" r="72" cx="90" cy="90" stroke-linecap="round" transform="rotate(-90 90 90)"/>
+                    </svg>
+                    <div class="score-percent">0%</div>
+                </div>
+                <div class="score-details">
+                    <div class="score-item">
+                        <span class="label">Правильных ответов:</span>
+                        <span class="value"><span class="correct-answers">0</span>/<span class="total-answers">8</span></span>
+                    </div>
+                    <div class="score-item">
+                        <span class="label">Набрано баллов:</span>
+                        <span class="value"><span class="score-result">0</span> из 100</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-message">
+                <h3 class="result-title"></h3>
+                <p class="result-description"></p>
+                <div class="badge">
+                    <i class="fas fa-medal"></i>
+                    <span class="badge-text"></span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn restart-btn">
+                    <i class="fas fa-redo"></i>
+                    <span>Пройти заново</span>
+                </button>
+                <button class="btn share-btn">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Поделиться результатом</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Квиз по безопасности в сети</p>
+    </footer>
+
+    <script>
+        // Данные квиза
+        const quizData = [
+            {
+                question: "Что такое фишинг (Phishing)?",
+                options: [
+                    "Способ ускорения интернет-соединения",
+                    "Вид мошенничества с целью получения конфиденциальных данных пользователя через поддельные письма или сайты",
+                    "Процесс очистки компьютера от вредоносных программ"
+                ],
+                correct: 1,
+                explanation: "Правильно! Фишинг - это вид мошенничества, когда злоумышленники притворяются доверенными лицами или организациями, чтобы заставить жертву раскрыть конфиденциальную информацию."
+            },
+            {
+                question: "Какой из следующих паролей является наиболее надежным?",
+                options: [
+                    "Password1234",
+                    "qwertz2024",
+                    "K9#mP!2x$vL8"
+                ],
+                correct: 2,
+                explanation: "Верно! Надежный пароль должен быть длинным (12+ символов), содержать буквы в разном регистре, цифры и специальные символы, и не должен быть очевидным или легко угадываемым."
+            },
+            {
+                question: "Для чего нужна двухфакторная аутентификация (2FA)?",
+                options: [
+                    "Чтобы автоматически создавать резервные копии файлов",
+                    "Для дополнительной защиты аккаунта путем задействования второго слоя проверки (например, кода из SMS или приложения)",
+                    "Чтобы ускорить вход в аккаунт без ввода основного пароля"
+                ],
+                correct: 1,
+                explanation: "Правильно! 2FA добавляет второй уровень безопасности. Даже если злоумышленник узнает ваш пароль, ему потребуется доступ к вашему телефону или приложению-аутентификатору."
+            },
+            {
+                question: "Что означает знак «замочка» в адресной строке браузера рядом с URL сайта?",
+                options: [
+                    "Соединение с сайтом защищено и зашифровано по протоколу HTTPS",
+                    "Сайт заблокирован антивирусом из-за угроз",
+                    "Сайт доступен для просмотра только администраторам"
+                ],
+                correct: 0,
+                explanation: "Верно! Замочек означает, что соединение защищено протоколом HTTPS, который шифрует данные между вашим браузером и сервером сайта."
+            },
+            {
+                question: "Что понимается под «социальной инженерией» в сфере безопасности?",
+                options: [
+                    "Разработка корпоративных социальных сетей",
+                    "Психологическое манипулирование людьми с целью побудить их раскрыть конфиденциальную информацию",
+                    "Автоматическая настройка прав доступа в операционной системе"
+                ],
+                correct: 1,
+                explanation: "Правильно! Социальная инженерия - это метод, основанный на психологическом воздействии, а не на технических уязвимостях."
+            },
+            {
+                question: "Что следует сделать, если вам пришло письмо от «банка» с требованием срочно перейти по ссылке и подтвердить данные карты?",
+                options: [
+                    "Перейти по ссылке и ввести данные, чтобы избежать блокировки",
+                    "Игнорировать ссылку, самостоятельно зайти в официальное приложение банка или позвонить на горячую линию",
+                    "Отправить в ответном письме сканы своих документов"
+                ],
+                correct: 1,
+                explanation: "Правильно! Банки никогда не просят переходить по ссылкам в письмах для подтверждения данных. Всегда проверяйте информацию через официальные каналы."
+            },
+            {
+                question: "Что делает вредоносная программа-вымогатель (Ransomware)?",
+                options: [
+                    "Шифрует файлы на устройстве и требует выкуп за ключ для их расшифровки",
+                    "Майнит криптовалюту за счет ресурсов видеокарты без ведома пользователя",
+                    "Показывает всплывающую рекламу при открытии браузера"
+                ],
+                correct: 0,
+                explanation: "Верно! Ransomware блокирует доступ к файлам или системе и требует выкуп для восстановления доступа."
+            },
+            {
+                question: "В чем заключается главная опасность использования открытых публичных сетей Wi-Fi без VPN?",
+                options: [
+                    "Злоумышленники в той же сети могут перехватить передаваемый незашифрованный трафик",
+                    "Публичный Wi-Fi приводит к физической поломке Wi-Fi-модуля",
+                    "При подключении автоматически стирается память устройства"
+                ],
+                correct: 0,
+                explanation: "Правильно! Без VPN ваши данные могут быть перехвачены злоумышленниками в той ж�� сети. Всегда используйте VPN при работе с конфиденциальной информацией в публичных сетях."
+            }
+        ];
+
+        // Элементы DOM
+        const screens = {
+            start: document.querySelector('.start-screen'),
+            quiz: document.querySelector('.quiz-screen'),
+            result: document.querySelector('.result-screen')
+        };
+
+        const elements = {
+            startBtn: document.querySelector('.start-btn'),
+            questionText: document.querySelector('.question-text'),
+            questionNum: document.querySelector('.q-num'),
+            optionsContainer: document.querySelector('.options-container'),
+            prevBtn: document.querySelector('.prev-btn'),
+            nextBtn: document.querySelector('.next-btn'),
+            hintText: document.querySelector('.hint-text'),
+            progressFill: document.querySelector('.progress-fill'),
+            currentQuestionSpan: document.querySelector('.current-question'),
+            totalQuestionsSpan: document.querySelector('.total-questions'),
+            scoreValue: document.querySelector('.score-value'),
+            restartBtn: document.querySelector('.restart-btn'),
+            shareBtn: document.querySelector('.share-btn'),
+            correctAnswersSpan: document.querySelector('.correct-answers'),
+            totalAnswersSpan: document.querySelector('.total-answers'),
+            scoreResult: document.querySelector('.score-result'),
+            scorePercent: document.querySelector('.score-percent'),
+            progressRingFill: document.querySelector('.progress-ring-fill'),
+            resultTitle: document.querySelector('.result-title'),
+            resultDescription: document.querySelector('.result-description'),
+            badgeText: document.querySelector('.badge-text')
+        };
+
+        // Состояние квиза
+        const quizState = {
+            currentQuestion: 0,
+            score: 0,
+            answers: [],
+            selectedOption: null
+        };
+
+        // Инициализация
+        function init() {
+            elements.totalQuestionsSpan.textContent = quizData.length;
+            elements.totalAnswersSpan.textContent = quizData.length;
+            
+            elements.startBtn.addEventListener('click', startQuiz);
+            elements.prevBtn.addEventListener('click', prevQuestion);
+            elements.nextBtn.addEventListener('click', nextQuestion);
+            elements.restartBtn.addEventListener('click', restartQuiz);
+            elements.shareBtn.addEventListener('click', shareResults);
+            
+            updateResultMessages();
+        }
+
+        // Функции переключения экранов
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenName].classList.add('active');
+        }
+
+        function startQuiz() {
+            quizState.currentQuestion = 0;
+            quizState.score = 0;
+            quizState.answers = [];
+            quizState.selectedOption = null;
+            
+            updateScore();
+            loadQuestion();
+            showScreen('quiz');
+        }
+
+        // Загрузка вопроса
+        function loadQuestion() {
+            const question = quizData[quizState.currentQuestion];
+            
+            elements.questionText.textContent = question.question;
+            elements.questionNum.textContent = quizState.currentQuestion + 1;
+            elements.currentQuestionSpan.textContent = quizState.currentQuestion + 1;
+            
+            // Обновляем прогресс-бар
+            const progressPercentage = ((quizState.currentQuestion + 1) / quizData.length) * 100;
+            elements.progressFill.style.width = `${progressPercentage}%`;
+            
+            // Очищаем контейнер с вариантами
+            elements.optionsContainer.innerHTML = '';
+            
+            // Создаем варианты ответов
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                
+                // Проверяем, был ли уже дан ответ на этот вопрос
+                const userAnswer = quizState.answers[quizState.currentQuestion];
+                const isSelected = userAnswer !== undefined && userAnswer === index;
+                const isCorrect = index === question.correct;
+                
+                if (userAnswer !== undefined) {
+                    if (isSelected && isCorrect) {
+                        optionElement.classList.add('correct');
+                    } else if (isSelected && !isCorrect) {
+                        optionElement.classList.add('incorrect');
+                    } else if (!isSelected && isCorrect) {
+                        optionElement.classList.add('correct');
+                    }
+                }
+                
+                if (isSelected) {
+                    optionElement.classList.add('selected');
+                }
+                
+                optionElement.innerHTML = `
+                    <div class="option-index">${String.fromCharCode(65 + index)}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                if (userAnswer === undefined) {
+                    optionElement.addEventListener('click', () => selectOption(index));
+                }
+                
+                elements.optionsContainer.appendChild(optionElement);
+            });
+            
+            // Обновляем кнопки навигации
+            elements.prevBtn.disabled = quizState.currentQuestion === 0;
+            
+            // Показываем подсказку, если ответ уже выбран
+            const userAnswer = quizState.answers[quizState.currentQuestion];
+            if (userAnswer !== undefined) {
+                elements.hintText.textContent = quizData[quizState.currentQuestion].explanation;
+                elements.nextBtn.disabled = false;
+            } else {
+                elements.hintText.textContent = "Выберите вариант ответа";
+                elements.nextBtn.disabled = true;
+            }
+            
+            // Обновляем текст кнопки "Далее" на последнем вопросе
+            if (quizState.currentQuestion === quizData.length - 1) {
+                elements.nextBtn.innerHTML = '<span>Завершить квиз</span><i class="fas fa-flag-checkered"></i>';
+            } else {
+                elements.nextBtn.innerHTML = '<span>Следующий вопрос</span><i class="fas fa-arrow-right"></i>';
+            }
+        }
+
+        // Выбор варианта ответа
+        function selectOption(optionIndex) {
+            if (quizState.answers[quizState.currentQuestion] !== undefined) return;
+            
+            quizState.selectedOption = optionIndex;
+            quizState.answers[quizState.currentQuestion] = optionIndex;
+            
+            // Проверяем правильность ответа
+            const isCorrect = optionIndex === quizData[quizState.currentQuestion].correct;
+            if (isCorrect) {
+                quizState.score += 12.5; // 100 / 8 вопросов = 12.5 баллов за вопрос
+                updateScore();
+            }
+            
+            // Показываем подсказку
+            elements.hintText.textContent = quizData[quizState.currentQuestion].explanation;
+            
+            // Актив��руем кнопку "Далее"
+            elements.nextBtn.disabled = false;
+            
+            // Перезагружаем вопрос для отображения правильных/неправильных ответов
+            loadQuestion();
+        }
+
+        // Навигация по вопросам
+        function prevQuestion() {
+            if (quizState.currentQuestion > 0) {
+                quizState.currentQuestion--;
+                quizState.selectedOption = quizState.answers[quizState.currentQuestion];
+                loadQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            if (quizState.currentQuestion < quizData.length - 1) {
+                quizState.currentQuestion++;
+                quizState.selectedOption = quizState.answers[quizState.currentQuestion];
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Завершение квиза
+        function finishQuiz() {
+            showScreen('result');
+            
+            // Подсчет правильных ответов
+            const correctCount = quizState.answers.reduce((count, answer, index) => {
+                return count + (answer === quizData[index].correct ? 1 : 0);
+            }, 0);
+            
+            // Расчет процентов
+            const percentage = Math.round((correctCount / quizData.length) * 100);
+            const score = Math.round(quizState.score);
+            
+            // Обновляем элементы результатов
+            elements.correctAnswersSpan.textContent = correctCount;
+            elements.scoreResult.textContent = score;
+            elements.scorePercent.textContent = `${percentage}%`;
+            
+            // Анимация прогресс-кольца
+            const circumference = 2 * Math.PI * 72;
+            const offset = circumference - (percentage / 100) * circumference;
+            elements.progressRingFill.style.strokeDashoffset = offset;
+            
+            // Обновляем сообщения результатов
+            updateResultMessages(percentage, correctCount);
+        }
+
+        // Обновление сообщений результатов
+        function updateResultMessages(percentage = 0, correctCount = 0) {
+            let title, description, badge;
+            
+            if (percentage >= 90) {
+                title = "Отличный результат!";
+                description = "Вы отлично разбираетесь в безопасности в сети! Ваши знания помогут вам избежать большинства онлайн-угроз.";
+                badge = "Эксперт по безопасности";
+            } else if (percentage >= 70) {
+                title = "Хороший результат!";
+                description = "Вы хорошо знакомы с основами кибербезопасности. Есть несколько областей, которые стоит изучить подробнее.";
+                badge = "Знаток безопасности";
+            } else if (percentage >= 50) {
+                title = "Неплохой результат!";
+                description = "У вас есть базовые знания, но есть пробелы в понимании некоторых аспектов безопасности в сети.";
+                badge = "Начинающий специалист";
+            } else {
+                title = "Есть куда расти!";
+                description = "Вам стоит уделить больше внимания изучению основ кибербезопасности. Это поможет лучше защитить себя в интернете.";
+                badge = "Новичок в безопасности";
+            }
+            
+            elements.resultTitle.textContent = title;
+            elements.resultDescription.textContent = description;
+            elements.badgeText.textContent = badge;
+        }
+
+        // Обновление счета
+        function updateScore() {
+            elements.scoreValue.textContent = Math.round(quizState.score);
+        }
+
+        // Перезапуск квиза
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // Поделиться результатами
+        function shareResults() {
+            const correctCount = parseInt(elements.correctAnswersSpan.textContent);
+            const percentage = parseInt(elements.scorePercent.textContent);
+            const badge = elements.badgeText.textContent;
+            
+            const shareText = `Я прошел квиз "Безопасность в сети" и набрал ${percentage}% (${correctCount}/8 правильных ответов)! Моя оценка: ${badge}. Проверьте свои знания по кибербезопасности!`;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Результаты квиза по безопасности в сети',
+                    text: shareText,
+                    url: window.location.href
+                });
+            } else {
+                // Копирование в буфер обмена
+                navigator.clipboard.writeText(shareText)
+                    .then(() => {
+                        alert('Результаты скопированы в буфер обмена!');
+                    })
+                    .catch(err => {
+                        console.error('Ошибка копирования: ', err);
+                        prompt('Скопируйте этот текст:', shareText);
+                    });
+            }
+        }
+
+        // Запуск при загрузке страницы
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
